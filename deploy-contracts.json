@@ -2,13 +2,13 @@
     {
         "contractName": "PPXLandMint",
         "chainId": "4002",
-        "address": "0x105503d86ED28b296Bae4E979D0B47844F5fE14a",
+        "address": "0x483005395B5b7792c5a39117D9Db8301606A8D5d",
         "netName": "ftmtest"
     },
     {
         "contractName": "PPXLand",
         "chainId": "80001",
-        "address": "0xbB6947018a92D7eA4e15e3dBafB93b334a8D0020",
+        "address": "0xAeF2f83afe4540b8d69726a62486D68791a41f4a",
         "netName": "matictest"
     }
 ]

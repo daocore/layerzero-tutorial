@@ -42,6 +42,14 @@ task("cross", "NFT Cross Chain Task")
             return
         }
 
+        let EndpointABI = [
+            "function retryPayload(uint16 _srcChainId, bytes calldata _srcAddress, bytes calldata _payload) external",
+            "function storedPayload(uint16 _srcChainId, bytes calldata _srcAddress) view"
+        ];
+
+        const EndpointContractFactory = new ethers.Contract(srcCrossChainData.endpoint, EndpointABI, deployer);
+        const EndpointContract = await EndpointContractFactory.attach(srcCrossChainData.endpoint);
+
         const contract = deployContracts[contractName(network?.name)];
         const LandContract = contract?.contract;
         let dstChainId = BigNumber.from(dstCrossChainData.chainId);
@@ -70,7 +78,7 @@ task("cross", "NFT Cross Chain Task")
         }
         console.log(output);
 
-        let ids = taskArgs?.ids?.split(",") || [], res, asstes;
+        let ids = taskArgs?.ids?.split(",") || [], res, asstes, payload;
         const receiver = taskArgs.address || deployer.address;
 
         switch (taskArgs.type) {
@@ -110,13 +118,43 @@ task("cross", "NFT Cross Chain Task")
                     value: fees
                 });
                 break;
+            // case "retry":
+            //     asstes = [{
+            //         owner: deployer.address,
+            //         ids
+            //     }]
+            //     payload = await LandContract.getPayload(asstes);
+            //     await EndpointContract.retryPayload(dstChainId, dstTrustedRemote, payload);
+            //     break;
+            case "payload":
+                payload = await EndpointContract.storedPayload(dstChainId, dstTrustedRemote);
+                console.log(payload);
+                break;
+            case "force":
+                await LandContract.forceResumeReceive(dstChainId, dstTrustedRemote);
+                break;
+            case "fail":
+                const failedMessages = await LandContract.failedMessages(dstChainId, dstTrustedRemote, taskArgs.nonce || 0);
+                console.log(failedMessages);
+                break;
+            // case "retryMessage":
+            //     asstes = [{
+            //         owner: deployer.address,
+            //         ids
+            //     }]
+            //     payload = await LandContract.getPayload(asstes);
+            //     console.log(payload)
 
+            //     return
+            //     await LandContract.retryMessage(dstChainId, dstTrustedRemote, taskArgs.nonce || 0, payload);
+            //     break;
             default:
                 console.log(`❌ type: ${taskArgs.type}, type error`);
                 return
         }
         if (res && taskArgs.type === "cross") {
             console.log(`${dstCrossChainData.chainId > 1000 ? URLS["testnet"] : URLS["mainnet"]}/tx/${res.hash}`)
+            console.log(`${srcCrossChainData.blockscan}/tx/${res.hash}`)
         } else {
             res && console.log(`${srcCrossChainData.blockscan}/tx/${res.hash}`)
         }

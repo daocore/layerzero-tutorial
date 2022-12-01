@@ -2,34 +2,11 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 
-interface ILayerZeroEndpoint {
-    function send(
-        uint16 _dstChainId,
-        bytes calldata _destination,
-        bytes calldata _payload,
-        address payable _refundAddress,
-        address _zroPaymentAddress,
-        bytes calldata _adapterParams
-    ) external payable;
-
-    function estimateFees(
-        uint16 _dstChainId,
-        address _userApplication,
-        bytes calldata _payload,
-        bool _payInZRO,
-        bytes calldata _adapterParam
-    ) external view returns (uint256 nativeFee, uint256 zroFee);
-}
-
-contract PPXLand is ERC721, Ownable {
+contract PPXLand is ERC721, NonblockingLzApp {
     uint256 private _lock = 1;
     uint256 internal _id;
-    ILayerZeroEndpoint public immutable lzEndpoint;
-
-    mapping(uint16 => bytes) public trustedRemoteLookup;
-    event SetTrustedRemote(uint16 _remoteChainId, bytes _path);
 
     struct Assets {
         address owner;
@@ -37,9 +14,10 @@ contract PPXLand is ERC721, Ownable {
     }
     event CrossEvent(address from, uint16 chainId, uint256[] ids);
 
-    constructor(address _endpoint) ERC721("PPXLand", "PPXL") {
-        lzEndpoint = ILayerZeroEndpoint(_endpoint);
-    }
+    constructor(address _endpoint)
+        ERC721("PPXLand", "PPXL")
+        NonblockingLzApp(_endpoint)
+    {}
 
     modifier lock() {
         require(_lock == 1, "LOCKED");
@@ -85,25 +63,12 @@ contract PPXLand is ERC721, Ownable {
         emit CrossEvent(msg.sender, _dstChainId, _ids);
     }
 
-    function lzReceive(
+    function _nonblockingLzReceive(
         uint16 _srcChainId,
-        bytes calldata _srcAddress,
+        bytes memory,
         uint64,
-        bytes calldata _payload
-    ) public virtual {
-        require(
-            _msgSender() == address(lzEndpoint),
-            "LzApp: invalid endpoint caller"
-        );
-
-        bytes memory trustedRemote = trustedRemoteLookup[_srcChainId];
-        require(
-            _srcAddress.length == trustedRemote.length &&
-                trustedRemote.length > 0 &&
-                keccak256(_srcAddress) == keccak256(trustedRemote),
-            "LzApp: invalid source sending contract"
-        );
-
+        bytes memory _payload
+    ) internal override {
         Assets memory assets = abi.decode(_payload, (Assets));
 
         uint256[] memory ids = assets.ids;
@@ -143,13 +108,5 @@ contract PPXLand is ERC721, Ownable {
             false,
             _adapterParams
         );
-    }
-
-    function setTrustedRemote(uint16 _srcChainId, bytes calldata _path)
-        external
-        onlyOwner
-    {
-        trustedRemoteLookup[_srcChainId] = _path;
-        emit SetTrustedRemote(_srcChainId, _path);
     }
 }

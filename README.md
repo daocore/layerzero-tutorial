@@ -2,7 +2,7 @@
 
 ## 一、什么是 LayerZero
 
-[LayerZero](https://layerzero.network/) 是一种全链互操作性协议，专为跨链传递轻量级消息而设计，它提供了可靠和有保障的去信任的消息传递。本质上是利用了轻节点的技术原理，将中间链的置信环节一分为二，从而以更低的费用换取更好的安全性。它既大幅减少开发者的学习成本和运营成本，又能减少用户端的使用费率，使得建立在 LayerZero 上的应用拥有安全成本优势。因此本系列教程旨在巩固自己的开发技能和帮助从未接触LayerZero跨链开发的开发者学习和交流，如有表述不清楚或错误的地方，还请斧正。本系列完整代码可在[layerzero-tutorial](https://github.com/daocore/layerzero-tutorial)中查看和下载。
+[LayerZero](https://layerzero.network/) 是一种全链互操作性协议，专为跨链传递轻量级消息而设计，它提供了可靠和有保障的去信任的消息传递。本质上是利用了轻节点的技术原理，将中间链的置信环节一分为二，从而以更低的费用换取更好的安全性。它既大幅减少开发者的学习成本和运营成本，又能减少用户端的使用费率，使得建立在 LayerZero 上的应用拥有安全成本优势。因此本系列教程旨在巩固自己的开发技能和帮助从未接触LayerZero跨链开发的开发者学习和交流，如有表述不清楚或错误的地方，还请斧正。本系列完整代码可在[layerzero-tutorial](https://github.com/daocore/layerzero-tutorial)中查看和克隆，该仓库克隆并下载完依赖后，可直接运行package中的cross脚本命令，无需再次部署。
 
 更多LayerZero相关信息请查看以下链接，本文不对LayerZero做更多介绍，只是讲解如何基于LayerZero实现数据的跨链。
     
@@ -77,7 +77,12 @@ main()
 
 ```
 
-### 5. 当代码准备完毕或clone后，运行各个scripts中的命令。例如执行以下命令后：
+### 5. 在根目录中新增一个文件名为.env的文件，内容为以下代码
+```
+PRIVATE_KEY=0xabc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc1
+```
+
+### 6. 当代码准备完毕或clone后，运行各个scripts中的命令。例如执行以下命令后：
 ```
 yarn deploy --network ftmtest
 ```
@@ -448,7 +453,7 @@ contract PPXLand is ERC721, Ownable {
 }
 ```
 
-上述代码便是本次实现全链跨链的代码。在LayerZero中，消息是由**LayerZero Endpoint**发送和接收的，通过[LayerZeroEndpoint](https://layerzero.gitbook.io/docs/faq/layerzero-endpoint)来处理消息传输、验证、接收。本教程(一)只是简单实现了发送和接收，接下来将对代码进行一个简单的解析：
+上述代码便是本次实现跨链的代码。在LayerZero中，消息是由**LayerZero Endpoint**发送和接收的，通过[LayerZeroEndpoint](https://layerzero.gitbook.io/docs/faq/layerzero-endpoint)来处理消息传输、验证、接收。本教程(一)只是简单实现了发送和接收，接下来将对代码进行一个简单的解析：
 
 * lzEndpoint: lzEndpoint的值是当前链的endpoint，更多endpoint可查看[Mainnet Endpoint](https://layerzero.gitbook.io/docs/technical-reference/mainnet/supported-chain-ids)   [Testnet Endpoint](https://layerzero.gitbook.io/docs/technical-reference/testnet/testnet-addresses)，该地址用于合约调用其内部的发送和接收消息的函数来实现消息的传输。
 
@@ -874,3 +879,5 @@ yarn cross --network matictest --to ftmtest --type cross --ids 0
 > 跨链成功的前提是需要在目标链上配置受信任地址，如果没有配置，可能会造成NFT丢失。对于各种跨链事故，LayerZero也有相应的处理方案，下一篇将讲解如何处理各种异常，如支付GAS不足导致接收端函数未执行等问题。
 
 以上步骤完整代码： [layerzero-tutorial V3.0.0](https://github.com/daocore/layerzero-tutorial/releases/tag/v3.0.0)
+
+至此我们由LayerZero实现了一个简单的跨链NFT，官方的[事例代码](https://github.com/LayerZero-Labs/solidity-examples/tree/main/contracts/examples)中，也有相关ERC721如何跨链的例子。如果觉得在下的表述和代码编写能力欠佳，还请阁下海涵。阁下也可前往[LayerZero-Labs/solidity-examples](https://github.com/LayerZero-Labs/solidity-examples)了解更多跨链的信息和用法。

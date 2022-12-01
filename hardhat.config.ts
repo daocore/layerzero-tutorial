@@ -28,7 +28,6 @@ const GWEI = 1000000000;
 const accounts = process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.4",
   networks: {
     matictest: {
       url: "https://rpc.ankr.com/polygon_mumbai",
@@ -37,7 +36,7 @@ const config: HardhatUserConfig = {
     },
     ftmtest: {
       url: "https://fantom-testnet.public.blastapi.io",
-      accounts: accounts,
+      accounts: accounts
     },
     avaxtest: {
       url: "https://rpc.ankr.com/avalanche_fuji",
@@ -78,7 +77,16 @@ const config: HardhatUserConfig = {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
     }
+  },
+  solidity: {
+    version: "0.8.4",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
   }
-};
+}
 
 export default config;
