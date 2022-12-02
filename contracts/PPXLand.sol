@@ -6,7 +6,7 @@ import "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 
 contract PPXLand is ERC721, NonblockingLzApp {
     uint256 private _lock = 1;
-    uint256 internal _id;
+    uint256 public totalSupply;
 
     struct Assets {
         address owner;
@@ -24,10 +24,6 @@ contract PPXLand is ERC721, NonblockingLzApp {
         _lock = 2;
         _;
         _lock = 1;
-    }
-
-    function totalSupply() external view returns (uint256) {
-        return _id;
     }
 
     function crossChain(
@@ -73,7 +69,7 @@ contract PPXLand is ERC721, NonblockingLzApp {
 
         uint256[] memory ids = assets.ids;
         uint256 len = ids.length;
-        uint256 total = _id;
+        uint256 total = totalSupply;
         unchecked {
             for (uint256 i = 0; i < len; ) {
                 uint256 id = ids[i];
@@ -89,9 +85,17 @@ contract PPXLand is ERC721, NonblockingLzApp {
                 }
                 ++i;
             }
-            _id = total;
+            totalSupply = total;
         }
         emit CrossEvent(address(this), _srcChainId, ids);
+    }
+
+    function getPayload(Assets memory _assets)
+        external
+        pure
+        returns (bytes memory _payload)
+    {
+        _payload = abi.encode(_assets);
     }
 
     function estimateFees(

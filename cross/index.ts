@@ -118,14 +118,14 @@ task("cross", "NFT Cross Chain Task")
                     value: fees
                 });
                 break;
-            // case "retry":
-            //     asstes = [{
-            //         owner: deployer.address,
-            //         ids
-            //     }]
-            //     payload = await LandContract.getPayload(asstes);
-            //     await EndpointContract.retryPayload(dstChainId, dstTrustedRemote, payload);
-            //     break;
+            case "retry":
+                asstes = {
+                    owner: deployer.address,
+                    ids
+                }
+                payload = await LandContract.getPayload(asstes);
+                await EndpointContract.retryPayload(dstChainId, dstTrustedRemote, payload);
+                break;
             case "payload":
                 payload = await EndpointContract.storedPayload(dstChainId, dstTrustedRemote);
                 console.log(payload);
@@ -137,17 +137,16 @@ task("cross", "NFT Cross Chain Task")
                 const failedMessages = await LandContract.failedMessages(dstChainId, dstTrustedRemote, taskArgs.nonce || 0);
                 console.log(failedMessages);
                 break;
-            // case "retryMessage":
-            //     asstes = [{
-            //         owner: deployer.address,
-            //         ids
-            //     }]
-            //     payload = await LandContract.getPayload(asstes);
-            //     console.log(payload)
+            case "retryMessage":
+                asstes = {
+                    owner: deployer.address,
+                    ids
+                }
+                payload = await LandContract.getPayload(asstes);
+                console.log(payload)
 
-            //     return
-            //     await LandContract.retryMessage(dstChainId, dstTrustedRemote, taskArgs.nonce || 0, payload);
-            //     break;
+                await LandContract.retryMessage(dstChainId, dstTrustedRemote, taskArgs.nonce || 0, payload);
+                break;
             default:
                 console.log(`❌ type: ${taskArgs.type}, type error`);
                 return
