@@ -2,7 +2,7 @@ module.exports = {
     //The value of is the network that mint nft
     landMintNetwork: {
         mainnet: "polygon",
-        testnet: "ftmtest"
+        testnet: "matictest"
     },
     network: {
         "matictest": {

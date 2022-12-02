@@ -35,7 +35,7 @@ const config: HardhatUserConfig = {
       chainId: 80001
     },
     ftmtest: {
-      url: "https://fantom-testnet.public.blastapi.io",
+      url: "https://rpc.ankr.com/fantom_testnet",
       accounts: accounts
     },
     avaxtest: {

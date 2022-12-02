@@ -1,5 +1,11 @@
 [
     {
+        "contractName": "PPXLand",
+        "chainId": "4002",
+        "address": "0x0CB53Ba92da9493083C213C7264E73C8316B4FFa",
+        "netName": "ftmtest"
+    },
+    {
         "contractName": "PPXLandMint",
         "chainId": "4002",
         "address": "0x483005395B5b7792c5a39117D9Db8301606A8D5d",
@@ -9,6 +15,12 @@
         "contractName": "PPXLand",
         "chainId": "80001",
         "address": "0xAeF2f83afe4540b8d69726a62486D68791a41f4a",
+        "netName": "matictest"
+    },
+    {
+        "contractName": "PPXLandMint",
+        "chainId": "80001",
+        "address": "0xC9B85122155B8E9a8c44A6049bBb541392970c38",
         "netName": "matictest"
     }
 ]

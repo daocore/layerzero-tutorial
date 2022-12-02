@@ -6,6 +6,7 @@ task("cross", "NFT Cross Chain Task")
     .addOptionalParam("to", "To Network")
     .addOptionalParam("ids", "Cross Chain ID example 1 or 1,2,3")
     .addOptionalParam("type", "action type")
+    .addOptionalParam("nonce", "cross-chain nonce")
     .addOptionalParam("address", "user address")
     .setAction(async (taskArgs, { network, ethers }: any) => {
         const { BigNumber } = ethers;
@@ -44,7 +45,7 @@ task("cross", "NFT Cross Chain Task")
 
         let EndpointABI = [
             "function retryPayload(uint16 _srcChainId, bytes calldata _srcAddress, bytes calldata _payload) external",
-            "function storedPayload(uint16 _srcChainId, bytes calldata _srcAddress) view"
+            "function hasStoredPayload(uint16 _srcChainId, bytes calldata _srcAddress) view returns(bool)"
         ];
 
         const EndpointContractFactory = new ethers.Contract(srcCrossChainData.endpoint, EndpointABI, deployer);
@@ -58,6 +59,12 @@ task("cross", "NFT Cross Chain Task")
             ['address', 'address'],
             [toData[0].address, contract.address]
         )
+
+        const srcTrustedRemote = ethers.utils.solidityPack(
+            ['address', 'address'],
+            [contract.address, toData[0].address]
+        )
+
         const isSetTrustedRemote = dstTrustedRemote?.toLowerCase() === trustedRemote?.toLowerCase();
         const output = {
             account: `${srcCrossChainData.blockscan}/address/${deployer.address}`,
@@ -100,7 +107,7 @@ task("cross", "NFT Cross Chain Task")
                 }
                 let adapterParams = ethers.utils.solidityPack(
                     ['uint16', 'uint256'],
-                    [1, 200000 + ids.length * 50000]
+                    [1, 20]
                 )
                 const fees = await LandContract.estimateFees(
                     dstChainId,
@@ -127,8 +134,8 @@ task("cross", "NFT Cross Chain Task")
                 await EndpointContract.retryPayload(dstChainId, dstTrustedRemote, payload);
                 break;
             case "payload":
-                payload = await EndpointContract.storedPayload(dstChainId, dstTrustedRemote);
-                console.log(payload);
+                const isHasPayload = await EndpointContract.hasStoredPayload(dstChainId, dstTrustedRemote);
+                console.log(isHasPayload);
                 break;
             case "force":
                 await LandContract.forceResumeReceive(dstChainId, dstTrustedRemote);
